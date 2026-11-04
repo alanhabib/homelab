@@ -28,7 +28,7 @@ The owner is documenting the journey (guides in `docs/`, and a YouTube series), 
 
 | Item | Value |
 | --- | --- |
-| Workstation | MacBook (user `alanhabib`), repo at `~/Desktop/hobby_projects/homelab`, GitHub `alanhabib/homelab` (private, HTTPS remote) |
+| Workstation | MacBook (user `alanhabib`), repo at `~/Desktop/hobby_projects/homelab`, GitHub `alanhabib/homelab` (public, HTTPS remote) |
 | Server | Lenovo ThinkPad T480s, hostname `homelab`, user `alandalo` |
 | OS | Ubuntu Server 26.04.1 LTS, no desktop |
 | CPU / RAM | Intel i5-8350U (4 cores / 8 threads), **8 GB RAM** (soldered; one free slot, max 24 GB) |

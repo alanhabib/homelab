@@ -6,7 +6,7 @@ It is written as a **learning journey**: I started with almost no Linux experien
 
 > **Status:** Phase 0–2 done (Ubuntu installed, connected from the MacBook). Phase 3 (this repo) in progress.
 
-> **About this repo:** this is the **private** repository with my real configuration. The guides use placeholders instead of personal values, so a cleaned-up copy can later be published as a separate **public** guide.
+> **About this repo:** This is the **public** repository with my real configuration. Secrets are never committed: they stay out via .gitignore, or are encrypted with Sealed Secrets. 
 
 ---
 
