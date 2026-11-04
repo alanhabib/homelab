@@ -1,0 +1,71 @@
+- name: Configure the homelab server
+  hosts: servers
+  # become is Ansible way of 'sudo'
+  become: true
+  handlers:
+    - name: Restart ssh
+      ansible.builtin.service:
+        name: ssh
+        state: restarted
+    - name: Restart logind
+      ansible.builtin.service:
+        name: systemd-logind
+        state: restarted
+  tasks:
+    - name: Set the timezone to swedish time
+      community.general.timezone:
+        name: Europe/Stockholm
+
+    - name: Update the package list and install all updates
+      ansible.builtin.apt:
+        update_cache: true # apt update
+        cache_valid_time: 3600 # if it was done 1h ago skip update
+        upgrade: dist # apt full-upgrade
+        autoremove: true # apt autoremove -> packages that came along automatically
+
+    - name: Install base packages
+      ansible.builtin.apt:
+        name:
+          - curl
+          - git
+          - htop
+          - ufw
+          - unattended-upgrades
+
+        # 'present' means to make sure the above packages is installed
+        state: present
+
+    - name: Turn on automatic security updates
+      ansible.builtin.copy:
+        dest: /etc/apt/apt.conf.d/20auto-upgrades
+        content: |
+          APT::Periodic::Update-Package-Lists "1";
+          APT::Periodic::Unattended-Upgrade "1";
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Harden SSH (keys only, no root login)
+      ansible.builtin.copy:
+        dest: /etc/ssh/sshd_config.d/10-hardening.conf
+        content: |
+          PasswordAuthentication no
+          KbdInteractiveAuthentication no
+          PermitRootLogin no
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Restart ssh
+
+    - name: Lid configuration (thinkpad's lid is down it needs to stay on)
+      ansible.builtin.copy:
+        dest: /etc/systemd/logind.conf.d/lid.conf
+        content: |
+          [Login]
+          HandleLidSwitch=ignore
+          HandleLidSwitchExternalPower=ignore
+          HandleLidSwitchDocked=ignore
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Restart logind

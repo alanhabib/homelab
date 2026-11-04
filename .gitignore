@@ -1,0 +1,19 @@
+# OpenTofu / Terraform: state and variables can contain secrets
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+
+# Kubernetes access files and unencrypted secrets
+kubeconfig*
+*.unsealed.yaml
+sealed-secrets-master-key.yaml
+
+# Keys, just in case
+*.pem
+*.key
+id_*
+
+# Ansible leftovers and macOS clutter
+*.retry
+.DS_Store
