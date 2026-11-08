@@ -1,6 +1,8 @@
 # Pitfalls and fixes
 
-Every mistake, surprise and "wait, what?" moment so far, and how it was solved. If you're stuck, start with the flowchart.
+Every mistake, surprise and "wait, what?" moment so far, and how it was solved: the **history**.
+
+> **Something broken right now?** Go to [Troubleshooting](troubleshooting.md): find your symptom, follow the checks.
 
 [← Back to README](../README.md) · Guides: [Phase 0](00-prepare-usb.md) · [Phase 1](01-install-ubuntu.md) · [Phase 2](02-network-and-ssh.md) · [Phase 3](03-git-repo.md) · [Phase 4](04-ansible.md)
 

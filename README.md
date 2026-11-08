@@ -6,6 +6,8 @@ It is written as a **learning journey**: I started with almost no Linux experien
 
 > **Status:** Phase 0–4 done (Ubuntu installed, connected from the MacBook, this repo, the server built with Ansible). Next: Phase 5, installing K3s.
 
+> **Something broken?** Start at [Troubleshooting](docs/troubleshooting.md): find your symptom, follow the checks.
+
 > **About this repo:** This is the **public** repository with my real configuration. Secrets are never committed: they stay out via `.gitignore`, or are encrypted with Sealed Secrets.
 
 ---
@@ -95,6 +97,8 @@ Start with the decisions, then follow the phases in order. **Guide numbers match
 | 2 | [Network, SSH and running headless](docs/02-network-and-ssh.md) | Wi-Fi with netplan, SSH keys, laptop lid, mesh vs main router, fixed IP |
 | 3 | [A Git repo for everything](docs/03-git-repo.md) | The repo structure, `.gitignore`, `CLAUDE.md`, going public safely |
 | 4 | [My server, built from code with Ansible](docs/04-ansible.md) | Ansible basics, dry runs, handlers, loops, SSH hardening, firewall and IP ranges, the slow-boot fix |
+| A | [Mock interview: Stage A](docs/interview-stage-a.md) | 5 interview questions on Phases 0–4, with model answers and every command explained |
+| – | [Troubleshooting](docs/troubleshooting.md) | Something's wrong? Find the symptom, follow the checks, plus a command cheat sheet |
 | – | [Pitfalls and fixes](docs/pitfalls.md) | Every mistake and surprise so far, a troubleshooting flowchart, golden rules |
 
 Screenshots live in [`docs/images/`](docs/images/README.md), with secrets blurred.
