@@ -2,7 +2,7 @@
 
 **Goal:** get the server online over Wi-Fi, control it from the Mac with an SSH key, keep it running with the lid closed, and give it an address that never changes.
 
-[← Phase 1, Install Ubuntu Server](01-install-ubuntu.md) · [Pitfalls and fixes →](pitfalls.md)
+[← Phase 1, Install Ubuntu Server](01-install-ubuntu.md) · [Next: Phase 3, Git repo →](03-git-repo.md)
 
 ---
 
@@ -311,7 +311,25 @@ The mesh ran a **separate network inside** the main one (a "double NAT"). The fi
 
 The router may warn *"IP already in use, please reboot"*. It's in use by the server itself. Instead of rebooting the router (internet down for the whole house), **reboot the server**: `sudo reboot`, wait 2 minutes, `ssh homelab`, and check `ip -4 addr show wlp61s0`.
 
-> After a reboot you may see *"System is booting up. Unprivileged users are not permitted to log in yet"*. Startup isn't finished; wait and try again. On this laptop it took several minutes, most likely waiting for the unused Ethernet port. That gets fixed later with Ansible.
+> After a reboot you may see *"System is booting up. Unprivileged users are not permitted to log in yet"*. Startup isn't finished; wait and try again. On this laptop it took several minutes: the system waited for the unused Ethernet port. I tracked it down and fixed it in [Phase 4, Task 9](04-ansible.md#task-9--the-2-minute-boot-fixed).
+
+---
+
+## If you lose your SSH key
+
+Losing the key doesn't lock you out forever. Password login is only switched off for **SSH** (Phase 4); the laptop's own keyboard still takes your password. **Whoever can touch the machine can always get in.**
+
+1. Make a new key on the (new) Mac: `ssh-keygen -t ed25519 -C "alan-macbook"`
+2. Open the lid, log in at the keyboard with your password
+3. Temporarily allow passwords again by moving the hardening file away, then restart SSH:
+   ```bash
+   sudo mv /etc/ssh/sshd_config.d/10-hardening.conf /root/
+   sudo systemctl restart ssh
+   ```
+4. From the Mac: `ssh-copy-id -i ~/.ssh/id_ed25519.pub <USER>@<SERVER_IP>`, then test `ssh homelab`
+5. Run the Ansible playbook -> it notices the hardening file is missing, puts it back and restarts SSH. Passwords are off again.
+
+**Better: don't get there.** Keep a copy of the private key in your password manager (it's encrypted with your passphrase), add a second key from another computer, and keep the server password safe.
 
 ---
 
@@ -336,6 +354,15 @@ The router may warn *"IP already in use, please reboot"*. It's in use by the ser
 - **The router wasn't the router:** `192.168.39.1` turned out to be the mesh unit, running its own network. → moved the server to the main router's Wi-Fi.
 - **SSH froze when switching Wi-Fi:** → expected; `Enter ~ .` closes it, and the router's Devices list shows the new IP.
 - **"IP already in use" when saving the static lease:** → it was the server itself; I rebooted the server, not the router.
-- **Very slow boot afterwards:** "System is booting up" for several minutes. → probably waiting for the unused Ethernet port; to be fixed in Phase 4.
+- **Very slow boot afterwards:** "System is booting up" for several minutes. → the system waited for the unused Ethernet port; fixed in [Phase 4](04-ansible.md#task-9--the-2-minute-boot-fixed).
 
 More details: [Pitfalls → Networking and SSH](pitfalls.md#networking-and-ssh), [Running a laptop as a server](pitfalls.md#running-a-laptop-as-a-server), [The home network](pitfalls.md#the-home-network)
+
+---
+
+## Video notes
+
+- **Episode idea:** "My server has no screen: Wi-Fi, SSH keys, and a network detective story"
+- **Show:** netplan on screen, the SSH key diagram, the lid test (close the lid, `uptime`), and the mesh detective work: `ip route` -> `ip neigh` -> MAC lookup -> "the router wasn't the router"
+- **Hook:** "I couldn't find my own router's admin page. Turns out I was talking to the wrong box all along."
+- **Blur:** router stickers (Wi-Fi and admin passwords), my public IP in the router page, the Wi-Fi password in `02-wifi.yaml`

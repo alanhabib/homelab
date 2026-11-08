@@ -28,8 +28,9 @@ flowchart TD
 | --- | --- | --- | --- |
 | Which Linux? | **Ubuntu Server LTS** | 5 years of free updates, best NVIDIA and Kubernetes support, most tutorials assume it | Fedora (new release about every 13 months), Omarchy (a desktop, not a server) |
 | Desktop on the server? | **No**, server edition only | Saves RAM; everything is done from the Mac. A desktop can be added later with one command | Ubuntu Desktop |
-| Single or multi-node Kubernetes? | **Multi-node, on one machine** | Real cluster behaviour for learning, without buying more hardware | Single-node K3s |
-| How to get several nodes on one machine? | **k3d**: Kubernetes nodes as Docker containers | Light, fast, all Kubernetes. No separate VM layer | Proxmox with VMs (rejected: the goal is Kubernetes, not a hypervisor) |
+| Which Kubernetes? | **K3s, installed directly on the server** | Runs like real infrastructure, uses less RAM than k3d, and a second computer can join later as a real second node | k3d (Kubernetes nodes as Docker containers: multi-node on one machine, but mainly a dev tool), Proxmox with VMs (rejected: the goal is Kubernetes, not a hypervisor) |
+| Multi-node? | **Later, with a second computer** | One machine = one real node. A second computer joins as a K3s agent; multiple clusters would need a third | Faking nodes with k3d |
+| sudo for Ansible | **`sudo.ws`** (classic sudo) | Ubuntu 26.04's new sudo-rs breaks Ansible's password prompt | Waiting for an Ansible fix |
 | Remote access | **Cloudflare Tunnel + Cloudflare Access** | Free, no open router ports, login with MFA in front of everything | Tailscale, port forwarding (unsafe) |
 | Configure the server | **Ansible** | The whole server setup in a file; re-runnable and rebuildable | Doing it by hand |
 | Things outside the server | **OpenTofu** (open-source Terraform) | Cloudflare DNS and access rules as code | Clicking in the dashboard |
@@ -52,9 +53,9 @@ Yes, all the software is free and open source. The only real costs:
 
 | Tool | In one line |
 | --- | --- |
-| **Docker** | Runs programs in isolated containers |
+| **Containers** | Programs packed with everything they need, running isolated from each other |
 | **Kubernetes** | Runs and looks after many containers across several machines (nodes) |
-| **k3d** | Runs a small Kubernetes (K3s) where each node is a Docker container |
+| **K3s** | A small, lightweight Kubernetes you install directly on a machine |
 | **Ingress / Traefik** | The front door that routes web requests to the right app |
 | **TLS** | The encryption behind `https://` |
 | **Ansible** | Describes how a server should be set up, then makes it so |
@@ -75,6 +76,13 @@ The long-term dream is a terminal agent, similar to Claude Code, running on a fr
 - This laptop has 8 GB of RAM and no NVIDIA GPU, so the agent waits until there is better hardware.
 
 That is why the platform comes first.
+
+---
+
+## How the plan changed along the way
+
+- **k3d -> K3s (November 2026).** I first planned k3d to fake three nodes on one laptop. I switched to K3s directly on the server: it's how Kubernetes runs on real machines, it uses less of my 8 GB, and a second computer can join as a real node. The full reasoning, and the four rules that keep a later migration easy, are in my learning roadmap.
+- **The career goal.** Learn Kubernetes here, then move the platform to **Azure** (AKS), aiming for AZ-104 and CKA.
 
 ---
 

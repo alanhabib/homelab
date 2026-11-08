@@ -2,7 +2,7 @@
 
 Every mistake, surprise and "wait, what?" moment so far, and how it was solved. If you're stuck, start with the flowchart.
 
-[← Back to README](../README.md) · Guides: [Phase 0](00-prepare-usb.md) · [Phase 1](01-install-ubuntu.md) · [Phase 2](02-network-and-ssh.md)
+[← Back to README](../README.md) · Guides: [Phase 0](00-prepare-usb.md) · [Phase 1](01-install-ubuntu.md) · [Phase 2](02-network-and-ssh.md) · [Phase 3](03-git-repo.md) · [Phase 4](04-ansible.md)
 
 ---
 
@@ -12,13 +12,14 @@ Every mistake, surprise and "wait, what?" moment so far, and how it was solved. 
 flowchart TD
     a["ssh homelab fails"] --> b{"What does it say?"}
     b -- "zsh: command not found<br/>for a Linux command" --> c["You're on the Mac, not the server.<br/>Check the prompt: % = Mac, $ = server"]
-    b -- "System is booting up.<br/>Unprivileged users not permitted" --> d["Startup isn't finished.<br/>Wait 1–5 minutes and retry"]
+    b -- "System is booting up.<br/>Unprivileged users not permitted" --> d["Startup isn't finished.<br/>Wait, then retry.<br/>Minutes? See pitfall 27"]
     b -- "Operation timed out /<br/>No route to host" --> e{"Did the server just<br/>change network or reboot?"}
     e -- "Yes" --> f["Look up its address in the<br/>router's Devices list"]
     f --> g["Update HostName in ~/.ssh/config"]
     e -- "No" --> h["Open the lid, look at the screen.<br/>Asleep? Check lid.conf.<br/>No network? Check netplan file"]
     b -- "asks for the server's password<br/>instead of the key passphrase" --> i["Key not accepted.<br/>Re-run ssh-copy-id"]
     b -- "Terminal frozen" --> j["Press Enter, then ~ then .<br/>to close the dead session"]
+    b -- "Permission denied (publickey)" --> k["Passwords are off by design.<br/>Wrong or lost key?<br/>See Phase 2: lose your key"]
 ```
 
 ---
@@ -75,7 +76,31 @@ flowchart TD
 | 24 | **Simplified router view** | Settings missing | Switch to the advanced view |
 | 25 | **SSH freezes when changing Wi-Fi** | The session ran over the network being changed | Expected. `Enter ~ .` closes it; find the new IP in the router |
 | 26 | **"IP already in use" on a static lease** | The router warned and asked for a reboot | It's the server itself. Reboot the **server**, not the router |
-| 27 | **Very slow first boot** | "System is booting up" for several minutes | Most likely waiting for the unused Ethernet port. To be fixed in Phase 4 |
+| 27 | **Very slow boot** | "System is booting up" for 2+ minutes | `systemd-analyze blame` showed `systemd-networkd-wait-online` waiting for the empty Ethernet port. **Fixed in Phase 4**: `optional: true` for that port in netplan |
+
+---
+
+### Git and the repo
+
+| # | Pitfall | What happened | Fix / lesson |
+| --- | --- | --- | --- |
+| 28 | **`.DS_Store` committed before `.gitignore` existed** | `.gitignore` doesn't affect files already tracked | `git rm --cached .DS_Store`, then commit |
+| 29 | **`mv` won't replace a folder** | `Directory not empty`, even with `-f` | `rm -r` the old one first, or `rsync -av --delete new/ old/` |
+| 30 | **The repo is public** | Everything, including history, is visible | Scan before going public; check `git diff --staged` before every commit |
+| 31 | **Editor folders sneak in** | `.idea/` from JetBrains | Add it to `.gitignore` |
+
+### Ansible
+
+| # | Pitfall | What happened | Fix / lesson |
+| --- | --- | --- | --- |
+| 32 | **`Timeout waiting for privilege escalation prompt`** | Ubuntu 26.04's **sudo-rs** words its password prompt differently, Ansible never hears its cue | `become_exe = sudo.ws` in `ansible.cfg` |
+| 33 | **Group and host with the same name** | `[homelab]` group + `homelab` host -> warning | Plural group names: `[servers]` |
+| 34 | **Typo the dry run didn't catch** | `group: rott` -> check mode said `changed`, no error | Read your own file; a dry run isn't a full test |
+| 35 | **`has no attribute 'value'`** | Typed `valie` in a loop item | The error names the word it **looked for** |
+| 36 | **Loop indented too far** | `loop:` under the module, so `item` never existed | Task-level words (`name`, module, `loop`, `notify`) share one column |
+| 37 | **`Unsupported parameters ... model`** | Typed `model` instead of `mode` | The error lists the supported words, find yours there |
+| 38 | **Vim `.swp` file appeared** | Vim wasn't closed properly | Reopen, `R` to recover, then delete the `.swp` |
+| 39 | **Afraid of locking myself out** | SSH hardening and the firewall can cut the connection | Second SSH tab open, allow before enable, test a new connection, keyboard as last resort |
 
 ---
 
@@ -87,3 +112,5 @@ flowchart TD
 4. **Don't delete what you don't understand** yet: find out what uses it first.
 5. **Keep a way back in**: a second SSH session, or the server's own keyboard, when changing network or SSH settings.
 6. **Never show secrets**: passwords, keys, router stickers, public IP.
+7. **Dry run first**: `--check --diff`, then read the output.
+8. **Write it down as code**: if I did it by hand, it belongs in the playbook.

@@ -90,3 +90,12 @@ shasum -a 256 ~/Downloads/ubuntu-26.04.1-live-server-amd64.iso
 - **Couldn't log in to Windows:** no password for the old Windows. → not needed; booting from USB skips Windows.
 
 More details: [Pitfalls → Preparing](pitfalls.md#preparing)
+
+---
+
+## Video notes
+
+- **Episode idea:** "Turning an old Windows laptop into a server: the plan and the USB stick"
+- **Show:** the plan (why Kubernetes, why platform first), downloading Ubuntu, balenaEtcher on the Mac
+- **Hook:** "This old laptop is about to become a Kubernetes server."
+- **Blur:** nothing special here, just don't show other drives' names if they're personal

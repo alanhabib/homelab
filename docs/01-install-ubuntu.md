@@ -183,3 +183,12 @@ What mine showed:
 - **Weaker hardware than hoped:** 8 GB RAM and no NVIDIA GPU. → fine for the platform; the local AI agent waits.
 
 More details: [Pitfalls → Installing](pitfalls.md#installing)
+
+---
+
+## Video notes
+
+- **Episode idea:** "Goodbye Windows: installing Ubuntu Server"
+- **Show:** the BIOS settings (film the screen with a phone, screen recorders can't run there), every installer screen and what I chose, the first login, growing the disk from 100G to 177G
+- **Hook:** "One click and Windows is gone for good. Here's every screen of the Ubuntu Server installer."
+- **Blur:** your password is never shown, but don't film the keyboard while typing it

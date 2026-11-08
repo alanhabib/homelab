@@ -11,6 +11,8 @@
       ansible.builtin.service:
         name: systemd-logind
         state: restarted
+    - name: Regenerate netplan
+      ansible.builtin.command: netplan generate
   tasks:
     - name: Set the timezone to swedish time
       community.general.timezone:
@@ -69,3 +71,54 @@
         group: root
         mode: "0644"
       notify: Restart logind
+
+    - name: Raise file-watch limits for Kubernetes
+      ansible.posix.sysctl:
+        name: "{{ item.name }}"
+        value: "{{ item.value }}"
+        sysctl_file: /etc/sysctl.d/90-kubernetes.conf
+        reload: true
+      loop:
+        - { name: fs.inotify.max_user_instances, value: "512" }
+        - { name: fs.inotify.max_user_watches, value: "524288" }
+
+    - name: Firewall - allow SSH, Kubernetes API and web from the home network
+      community.general.ufw:
+        rule: allow
+        from_ip: 192.168.1.0/24
+        port: "{{ item }}"
+        proto: tcp
+      loop:
+        - "22"
+        - "6443"
+        - "80"
+        - "443"
+
+    - name: Firewall - allow K3s internal networks (pods & services)
+      community.general.ufw:
+        rule: allow
+        from_ip: "{{ item }}"
+      loop:
+        - 10.42.0.0/16
+        - 10.43.0.0/16
+
+    - name: Firewall - block everything else and switch it on
+      community.general.ufw:
+        state: enabled
+        direction: incoming
+        policy: deny
+
+    - name: Make ethernet port optional, so boot doesn't wait for cable
+      ansible.builtin.copy:
+        dest: /etc/netplan/01-ethernet.yaml
+        content: |
+          network:
+            version: 2
+            ethernets:
+              enp0s31f6:
+                dhcp4: true
+                optional: true
+        owner: root
+        group: root
+        mode: "0600"
+      notify: Regenerate netplan

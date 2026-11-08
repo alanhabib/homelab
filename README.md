@@ -4,15 +4,17 @@ This repository documents and holds everything needed to turn an old Windows lap
 
 It is written as a **learning journey**: I started with almost no Linux experience, and every step, command and mistake is written down so you can follow along from zero.
 
-> **Status:** Phase 0–2 done (Ubuntu installed, connected from the MacBook). Phase 3 (this repo) in progress.
+> **Status:** Phase 0–4 done (Ubuntu installed, connected from the MacBook, this repo, the server built with Ansible). Next: Phase 5, installing K3s.
 
-> **About this repo:** This is the **public** repository with my real configuration. Secrets are never committed: they stay out via .gitignore, or are encrypted with Sealed Secrets. 
+> **About this repo:** This is the **public** repository with my real configuration. Secrets are never committed: they stay out via `.gitignore`, or are encrypted with Sealed Secrets.
 
 ---
 
 ## What we are building
 
 The goal is the **platform**, not any single app. Apps (and maybe a local AI agent later) are bonuses that run on top.
+
+**My goal:** learn Kubernetes here, on real hardware, then move the platform to **Azure** (AKS).
 
 ```mermaid
 flowchart TB
@@ -22,8 +24,7 @@ flowchart TB
     subgraph home["Home network"]
         router["Telia router<br/>no open ports"]
         subgraph server["ThinkPad server: Ubuntu Server LTS"]
-            docker["Docker"]
-            subgraph k8s["k3d Kubernetes cluster: 1 control plane + 2 workers"]
+            subgraph k8s["K3s Kubernetes cluster: 1 node now, a 2nd joins later"]
                 argo["Argo CD<br/>GitOps"]
                 apps["Apps<br/>Uptime Kuma, ..."]
                 mon["Monitoring<br/>Prometheus + Grafana"]
@@ -39,12 +40,11 @@ flowchart TB
     git -- "Argo CD pulls changes" --> argo
     argo --> apps
     argo --> mon
-    docker --> k8s
 ```
 
 **Key ideas**
 
-- **Everything as code.** Server setup (Ansible), cluster (k3d config), apps (Kubernetes manifests) and Cloudflare (OpenTofu) all live in this repo. If the server dies, it can be rebuilt from Git.
+- **Everything as code.** Server setup (Ansible), cluster (K3s, installed with Ansible), apps (Kubernetes manifests) and Cloudflare (OpenTofu) all live in this repo. If the server dies, it can be rebuilt from Git.
 - **No open ports.** Remote access goes through an outbound Cloudflare Tunnel with a login in front, never port forwarding.
 - **Free and open source.** The only costs are a domain name (about 100–150 kr a year) and electricity.
 
@@ -57,9 +57,9 @@ flowchart LR
     p0["0 Prepare<br/>USB stick"]:::done
     p1["1 Install<br/>Ubuntu"]:::done
     p2["2 Connect<br/>from Mac"]:::done
-    p3["3 Git repo"]:::now
-    p4["4 Ansible"]:::todo
-    p5["5 k3d cluster"]:::todo
+    p3["3 Git repo"]:::done
+    p4["4 Ansible"]:::done
+    p5["5 K3s cluster"]:::now
     p6["6 First app"]:::todo
     p7["7 Argo CD"]:::todo
     p8["8 Sealed Secrets"]:::todo
@@ -68,9 +68,11 @@ flowchart LR
     p11["11 Monitoring"]:::todo
     p12["12 Backups"]:::todo
     p13["13 CI"]:::todo
+    p14["14 Routine"]:::todo
+    p15["15 Azure"]:::todo
 
     p0 --> p1 --> p2 --> p3 --> p4 --> p5 --> p6 --> p7
-    p7 --> p8 --> p9 --> p10 --> p11 --> p12 --> p13
+    p7 --> p8 --> p9 --> p10 --> p11 --> p12 --> p13 --> p14 --> p15
 
     classDef done fill:#d4edda,stroke:#28a745,color:#155724
     classDef now fill:#fff3cd,stroke:#ffc107,color:#856404
@@ -83,15 +85,16 @@ Green = done, yellow = in progress, grey = not started.
 
 ## Guides
 
-Start with the decisions, then follow the phases in order. **Guide numbers match the phase numbers in the roadmap.** Each guide follows the same pattern: **goal → steps → what each command does → how to check it worked (Done when) → problems I hit**.
+Start with the decisions, then follow the phases in order. **Guide numbers match the phase numbers in the roadmap.** Each guide follows the same pattern: **goal → steps → what each command does → how to check it worked (Done when) → problems I hit → video notes**.
 
 | Phase | Guide | What you learn |
 | --- | --- | --- |
-| – | [Decisions: what we build and why](docs/decisions.md) | Why Ubuntu, k3d, Cloudflare, platform-first; every tool in one line |
+| – | [Decisions: what we build and why](docs/decisions.md) | Why Ubuntu, K3s, Cloudflare, platform-first; every tool in one line |
 | 0 | [Prepare the USB stick](docs/00-prepare-usb.md) | Download Ubuntu, write it to a USB stick from a Mac |
 | 1 | [Install Ubuntu Server](docs/01-install-ubuntu.md) | BIOS, every installer screen, first login, growing the disk |
 | 2 | [Network, SSH and running headless](docs/02-network-and-ssh.md) | Wi-Fi with netplan, SSH keys, laptop lid, mesh vs main router, fixed IP |
-| 3 | The Git repository *(in progress)* | Git basics, the repo structure, the first commit |
+| 3 | [A Git repo for everything](docs/03-git-repo.md) | The repo structure, `.gitignore`, `CLAUDE.md`, going public safely |
+| 4 | [My server, built from code with Ansible](docs/04-ansible.md) | Ansible basics, dry runs, handlers, loops, SSH hardening, firewall and IP ranges, the slow-boot fix |
 | – | [Pitfalls and fixes](docs/pitfalls.md) | Every mistake and surprise so far, a troubleshooting flowchart, golden rules |
 
 Screenshots live in [`docs/images/`](docs/images/README.md), with secrets blurred.
@@ -108,6 +111,7 @@ Screenshots live in [`docs/images/`](docs/images/README.md), with secrets blurre
 | Disk | 256 GB NVMe SSD | Enough to start |
 | GPU | Intel UHD 620 (built in), no NVIDIA | A local LLM is not realistic on this machine |
 | Network | Wi-Fi to the main router for now; Ethernet later | |
+| Second node | Planned: another computer joins as a K3s worker | A real multi-node cluster |
 
 The day-to-day work happens from a **MacBook** over SSH. The server has no desktop and its lid stays closed.
 
@@ -136,13 +140,14 @@ The day-to-day work happens from a **MacBook** over SSH. The server has no deskt
 ```
 homelab/
 ├── README.md           ← you are here
+├── CLAUDE.md           ← context for Claude (how I work, current state)
+├── LICENSE             ← MIT
 ├── docs/               ← the step-by-step guides (NN = phase number)
 │   ├── decisions.md
 │   ├── 00-prepare-usb.md, 01-install-ubuntu.md, 02-network-and-ssh.md, ...
 │   ├── pitfalls.md
 │   └── images/         ← screenshots, secrets blurred
-├── ansible/            ← server configuration (Phase 4)
-├── k3d/                ← cluster definition (Phase 5)
+├── ansible/            ← server configuration and K3s install (Phases 4–5)
 ├── bootstrap/          ← the one Argo CD app applied by hand (Phase 7)
 ├── argocd-apps/        ← one Argo CD Application per app
 ├── apps/               ← Kubernetes manifests for apps
