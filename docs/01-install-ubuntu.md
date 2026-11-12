@@ -6,6 +6,27 @@
 
 ---
 
+## The journey so far
+
+Everything from the very start up to the end of this phase. Green = earlier phases, yellow = this phase, grey = what comes next.
+
+```mermaid
+flowchart TB
+    p0["Phase 0 · USB stick"]:::done --> p1
+    subgraph p1["Phase 1 · Install Ubuntu Server"]
+        a["BIOS settings"]:::now --> b["Boot from the USB"]:::now
+        b --> c["Installer: wipe disk,<br/>OpenSSH on, no encryption"]:::now
+        c --> d["Reboot, first login"]:::now --> e["Updates"]:::now
+        e --> f["Grow the disk with LVM"]:::now --> g["Check the hardware"]:::now
+    end
+    p1 --> n["Phase 2 · Network and SSH"]:::next
+    classDef done fill:#d4edda,stroke:#28a745,color:#155724
+    classDef now fill:#fff3cd,stroke:#ffc107,color:#856404
+    classDef next fill:#f1f3f5,stroke:#adb5bd,color:#495057,stroke-dasharray: 4 3
+```
+
+---
+
 ## The whole install at a glance
 
 ```mermaid

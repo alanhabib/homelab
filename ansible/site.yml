@@ -122,3 +122,43 @@
         group: root
         mode: "0600"
       notify: Regenerate netplan
+
+    - name: Create k3s settings folder
+      ansible.builtin.file:
+        path: /etc/rancher/k3s
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: k3s settings
+      ansible.builtin.copy:
+        dest: /etc/rancher/k3s/config.yaml
+        content: |
+          tls-san:
+            - "192.168.1.193"
+            - "homelab"
+        owner: root
+        group: root
+        mode: "0600"
+
+    - name: Download the k3s install script
+      ansible.builtin.get_url:
+        url: https://get.k3s.io
+        dest: /tmp/k3s-install.sh
+        owner: root
+        group: root
+        mode: "0700"
+
+    - name: Install k3s (only if it isn't installed yet)
+      ansible.builtin.command:
+        cmd: /tmp/k3s-install.sh
+        creates: /usr/local/bin/k3s
+      environment:
+        INSTALL_K3S_VERSION: "v1.37.2+k3s1"
+
+    - name: Make sure k3s is running and starts at boot
+      ansible.builtin.service:
+        name: k3s
+        state: started
+        enabled: true

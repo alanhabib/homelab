@@ -8,6 +8,29 @@ Honestly, Ansible blew my mind. This is the phase where it clicked for me why pe
 
 ---
 
+## The journey so far
+
+Everything from the very start up to the end of this phase. Green = earlier phases, yellow = this phase, grey = what comes next.
+
+```mermaid
+flowchart TB
+    p0["Phase 0 · USB stick"]:::done --> p1["Phase 1 · Ubuntu Server"]:::done
+    p1 --> p2["Phase 2 · Network and SSH"]:::done --> p3["Phase 3 · Git repo"]:::done --> p4
+    subgraph p4["Phase 4 · Ansible"]
+        s["Setup files + ping"]:::now --> t1["1 Timezone"]:::now
+        t1 --> t2["2 Updates"]:::now --> t3["3 Base packages"]:::now
+        t3 --> t4["4 Auto security updates"]:::now --> t5["5 SSH: keys only"]:::now
+        t5 --> t6["6 Lid setting"]:::now --> t7["7 Kernel limits"]:::now
+        t7 --> t8["8 Firewall"]:::now --> t9["9 Fast boot"]:::now
+    end
+    p4 --> n["Phase 5 · K3s"]:::next
+    classDef done fill:#d4edda,stroke:#28a745,color:#155724
+    classDef now fill:#fff3cd,stroke:#ffc107,color:#856404
+    classDef next fill:#f1f3f5,stroke:#adb5bd,color:#495057,stroke-dasharray: 4 3
+```
+
+---
+
 ## Part 1 · What Ansible is (and what it replaces)
 
 In Phase 2 I set up the server by logging in and typing, one command at a time: updates, the lid file, restarts. It worked, but nothing was written down.

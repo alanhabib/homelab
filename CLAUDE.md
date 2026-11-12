@@ -12,6 +12,9 @@ The owner is documenting the journey (guides in `docs/`, and a YouTube series), 
 
 ## How to work with me
 
+- **Language:** we talk in **Swedish**. All documentation, code and code comments are written in **English**.
+- **Request mode:** for every step, describe **what** needs to be achieved and **why**, in plain words, and link to the official documentation where I can find the answer. **Don't give me the code.** I write the solution myself. When I say "done", read my files and give feedback **in words only**: what's right, what's wrong, and why. Give the full answer only if I say I'm stuck.
+- **Diagrams:** with every step, show a simple diagram of the **whole journey from the very start up to the current step** (earlier phases, this phase's steps, "you are here", what's next). Every guide in `docs/` gets the same kind of diagram. Later, quiz me by showing a diagram and letting me explain the flow.
 - I'm **learning Linux and Kubernetes**. Give **one step at a time**, explain what it does and each part of it, and tell me what output to expect. Wait for my result before the next step.
 - Use **simple, everyday words** and give an example. If a technical word is needed, explain it in plain words. Don't make me guess.
 - I **write every file myself**. Never write or change files in the repo. Explain what to write and why, and I type it.

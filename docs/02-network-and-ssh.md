@@ -4,6 +4,26 @@
 
 [← Phase 1, Install Ubuntu Server](01-install-ubuntu.md) · [Next: Phase 3, Git repo →](03-git-repo.md)
 
+
+## The journey so far
+
+Everything from the very start up to the end of this phase. Green = earlier phases, yellow = this phase, grey = what comes next.
+
+```mermaid
+flowchart TB
+    p0["Phase 0 · USB stick"]:::done --> p1["Phase 1 · Ubuntu Server"]:::done --> p2
+    subgraph p2["Phase 2 · Network, SSH and running headless"]
+        a["Wi-Fi with netplan"]:::now --> b["Updates"]:::now
+        b --> c["SSH from the Mac<br/>with a password"]:::now --> d["SSH key +<br/>ssh homelab shortcut"]:::now
+        d --> e["Lid closed, server on"]:::now --> f["Mesh surprise:<br/>move to the main router"]:::now
+        f --> g["Static lease: fixed IP"]:::now
+    end
+    p2 --> n["Phase 3 · Git repo"]:::next
+    classDef done fill:#d4edda,stroke:#28a745,color:#155724
+    classDef now fill:#fff3cd,stroke:#ffc107,color:#856404
+    classDef next fill:#f1f3f5,stroke:#adb5bd,color:#495057,stroke-dasharray: 4 3
+```
+
 ---
 
 ## Overview

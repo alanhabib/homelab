@@ -6,6 +6,26 @@
 
 ---
 
+## The journey so far
+
+Everything from the very start up to the end of this phase. Green = earlier phases, yellow = this phase, grey = what comes next.
+
+```mermaid
+flowchart TB
+    idea["Idea: a Kubernetes homelab<br/>on an old laptop"]:::done --> p0
+    subgraph p0["Phase 0 · Prepare the USB stick"]
+        a["Download Ubuntu Server ISO"]:::now --> b["Check the checksum"]:::now
+        b --> c["Install balenaEtcher"]:::now --> d["Unplug other drives"]:::now
+        d --> e["Flash the stick"]:::now
+    end
+    p0 --> n["Phase 1 · Install Ubuntu"]:::next
+    classDef done fill:#d4edda,stroke:#28a745,color:#155724
+    classDef now fill:#fff3cd,stroke:#ffc107,color:#856404
+    classDef next fill:#f1f3f5,stroke:#adb5bd,color:#495057,stroke-dasharray: 4 3
+```
+
+---
+
 ## What you need
 
 - A USB stick of **8 GB or more** (16 GB used here). Everything on it will be erased.
